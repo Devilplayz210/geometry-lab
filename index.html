@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Geometry Lab</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root{
+    --bg:#050608;
+    --surface:#0d0f13;
+    --surface2:#11141a;
+    --surface3:#171a21;
+    --border:#252a33;
+
+    --text:#f4f6f8;
+    --muted:#858c9a;
+
+    --neon:#d9ff55;
+    --neon2:#8cff00;
+    --purple:#9b6cff;
+    --cyan:#45e8ff;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    min-height:100%;
+}
+
+body{
+    min-height:100vh;
+    padding:30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-family:"DM Sans",sans-serif;
+    color:var(--text);
+
+    background:#050608;
+
+    overflow-x:hidden;
+    position:relative;
+}
+
+/* ========================================
+   NEON BACKGROUND
+======================================== */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+
+    background:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:55px 55px;
+
+    mask-image:linear-gradient(
+        to bottom,
+        transparent,
+        black 20%,
+        black 80%,
+        transparent
+    );
+
+    pointer-events:none;
+}
+
+body::after{
+    content:"";
+    position:fixed;
+    width:650px;
+    height:650px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(217,255,85,.11) 0%,
+            rgba(140,255,0,.045) 30%,
+            transparent 70%
+        );
+
+    filter:blur(25px);
+
+    top:-250px;
+    left:-230px;
+
+    animation:ambient 8s ease-in-out infinite alternate;
+
+    pointer-events:none;
+}
+
+@keyframes ambient{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+
+    to{
+        transform:translate(100px,80px) scale(1.15);
+    }
+}
+
+/* Extra neon light */
+.neon-light{
+    position:fixed;
+
+    width:500px;
+    height:500px;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        rgba(155,108,255,.08),
+        transparent 68%
+    );
+
+    filter:blur(30px);
+
+    right:-180px;
+    bottom:-180px;
+
+    pointer-events:none;
+}
+
+/* ========================================
+   MAIN APP
+======================================== */
+
+.app{
+    position:relative;
+    z-index:5;
+
+    width:100%;
+    max-width:1080px;
+    min-height:650px;
+
+    display:grid;
+    grid-template-columns:38% 62%;
+
+    background:rgba(12,14,18,.88);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:32px;
+
+    overflow:hidden;
+
+    backdrop-filter:blur(25px);
+
+    box-shadow:
+        0 0 0 1px rgba(217,255,85,.015),
+        0 30px 100px rgba(0,0,0,.65),
+        0 0 80px rgba(217,255,85,.035);
+}
+
+/* Neon border glow */
+
+.app::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    border-radius:32px;
+
+    box-shadow:
+        inset 0 0 40px rgba(217,255,85,.018);
+
+    pointer-events:none;
+}
+
+/* ========================================
+   LEFT SIDE
+======================================== */
+
+.sidebar{
+    position:relative;
+
+    padding:45px;
+
+    border-right:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,23,29,.96),
+            rgba(7,9,12,.96)
+        );
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    overflow:hidden;
+}
+
+/* Neon glow inside sidebar */
+
+.sidebar::before{
+    content:"";
+
+    position:absolute;
+
+    width:400px;
+    height:400px;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        rgba(217,255,85,.075),
+        transparent 68%
+    );
+
+    top:-250px;
+    left:-250px;
+
+    filter:blur(20px);
+}
+
+/* Bottom glow */
+
+.sidebar::after{
+    content:"";
+
+    position:absolute;
+
+    width:300px;
+    height:300px;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        rgba(69,232,255,.045),
+        transparent 70%
+    );
+
+    bottom:-200px;
+    right:-150px;
+
+    filter:blur(25px);
+}
+
+.logo{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:var(--neon);
+
+    font-size:12px;
+    font-weight:700;
+
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
+
+.logo-icon{
+    width:36px;
+    height:36px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:11px;
+
+    background:var(--neon);
+    color:#080a08;
+
+    font-size:20px;
+    font-weight:900;
+
+    box-shadow:
+        0 0 18px rgba(217,255,85,.28),
+        0 0 45px rgba(217,255,85,.08);
+}
+
+.sidebar-content{
+    position:relative;
+    z-index:2;
+}
+
+.sidebar h1{
+    font-family:"Space Grotesk",sans-serif;
+
+    font-size:clamp(40px,4vw,59px);
+
+    line-height:.94;
+
+    letter-spacing:-.06em;
+
+    margin-bottom:23px;
+}
+
+.sidebar h1 span{
+    color:var(--neon);
+
+    text-shadow:
+        0 0 20px rgba(217,255,85,.25);
+}
+
+.sidebar-description{
+    max-width:310px;
+
+    color:var(--muted);
+
+    font-size:14px;
+    line-height:1.7;
+}
+
+/* ========================================
+   BEAUTIFUL SHAPE ILLUSTRATIONS
+======================================== */
+
+.shape-preview{
+    display:flex;
+    gap:12px;
+
+    margin-top:38px;
+}
+
+.shape-card{
+    width:60px;
+    height:60px;
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(255,255,255,.025);
+
+    border:1px solid #252a31;
+
+    border-radius:16px;
+
+    transition:.3s ease;
+
+    overflow:hidden;
+}
+
+.shape-card::before{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:radial-gradient(
+        circle at center,
+        rgba(217,255,85,.07),
+        transparent 65%
+    );
+
+    opacity:0;
+
+    transition:.3s;
+}
+
+.shape-card:hover{
+    border-color:rgba(217,255,85,.45);
+
+    transform:translateY(-5px);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.3),
+        0 0 20px rgba(217,255,85,.08);
+}
+
+.shape-card:hover::before{
+    opacity:1;
+}
+
+/* Square */
+
+.square-shape{
+    width:25px;
+    height:25px;
+
+    border:2px solid var(--neon);
+
+    box-shadow:
+        0 0 7px rgba(217,255,85,.45);
+}
+
+/* Circle */
+
+.circle-shape{
+    width:26px;
+    height:26px;
+
+    border:2px solid var(--cyan);
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 8px rgba(69,232,255,.4);
+}
+
+/* Rectangle */
+
+.rectangle-shape{
+    width:32px;
+    height:21px;
+
+    border:2px solid #b58cff;
+
+    box-shadow:
+        0 0 8px rgba(181,140,255,.35);
+}
+
+/* Triangle (Hollow/Outlined SVG) */
+
+.triangle-svg{
+    width:28px;
+    height:26px;
+    display:block;
+    filter:drop-shadow(0 0 6px rgba(217,255,85,.45));
+}
+
+.sidebar-footer{
+    position:relative;
+    z-index:2;
+
+    color:#4f5662;
+
+    font-size:10px;
+
+    letter-spacing:.12em;
+}
+
+/* ========================================
+   CALCULATOR
+======================================== */
+
+.calculator{
+    padding:45px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.topbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    margin-bottom:34px;
+}
+
+.eyebrow{
+    color:var(--neon);
+
+    font-size:10px;
+    font-weight:700;
+
+    letter-spacing:.16em;
+    text-transform:uppercase;
+
+    margin-bottom:9px;
+
+    text-shadow:
+        0 0 12px rgba(217,255,85,.2);
+}
+
+.topbar h2{
+    font-family:"Space Grotesk",sans-serif;
+
+    font-size:26px;
+
+    letter-spacing:-.04em;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 12px;
+
+    border:1px solid var(--border);
+
+    border-radius:999px;
+
+    color:#727a88;
+
+    font-size:10px;
+}
+
+.status-dot{
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:#555c68;
+}
+
+.status.active{
+    color:var(--neon);
+
+    border-color:rgba(217,255,85,.16);
+}
+
+.status.active .status-dot{
+    background:var(--neon);
+
+    box-shadow:
+        0 0 6px var(--neon),
+        0 0 15px rgba(217,255,85,.4);
+}
+
+/* ========================================
+   FORM
+======================================== */
+
+.form-grid{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:18px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+
+    gap:9px;
+}
+
+.field-label{
+    color:#bfc4cc;
+
+    font-size:11px;
+    font-weight:600;
+}
+
+.select-wrapper{
+    position:relative;
+}
+
+select,
+input{
+    width:100%;
+    height:52px;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    background:#11141a;
+
+    color:var(--text);
+
+    padding:0 16px;
+
+    outline:none;
+
+    font-family:inherit;
+    font-size:13px;
+    font-weight:500;
+
+    transition:.25s ease;
+}
+
+select{
+    appearance:none;
+    cursor:pointer;
+    padding-right:45px;
+}
+
+.select-wrapper::after{
+    content:"⌄";
+
+    position:absolute;
+
+    right:17px;
+    top:50%;
+
+    transform:translateY(-55%);
+
+    color:#747c89;
+
+    font-size:17px;
+
+    pointer-events:none;
+}
+
+select:hover,
+input:hover{
+    border-color:#343a45;
+}
+
+select:focus,
+input:focus{
+    border-color:rgba(217,255,85,.65);
+
+    box-shadow:
+        0 0 0 3px rgba(217,255,85,.055),
+        0 0 18px rgba(217,255,85,.035);
+}
+
+input::placeholder{
+    color:#555d69;
+}
+
+/* ========================================
+   INPUT PANEL
+======================================== */
+
+.inputs-container{
+    margin-top:22px;
+
+    padding:20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,21,27,.9),
+            rgba(11,13,17,.9)
+        );
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+}
+
+.inputs-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:17px;
+}
+
+.inputs-title{
+    color:#c9cdd5;
+
+    font-size:11px;
+    font-weight:700;
+}
+
+.unit{
+    color:#505763;
+
+    font-size:9px;
+
+    letter-spacing:.1em;
+
+    text-transform:uppercase;
+}
+
+.input-row{
+    display:none;
+
+    animation:inputIn .3s ease;
+}
+
+.input-row.active{
+    display:block;
+}
+
+.dimension{
+    display:flex;
+    flex-direction:column;
+
+    gap:8px;
+}
+
+.dimension + .dimension{
+    margin-top:14px;
+}
+
+.dimension label{
+    color:#7f8794;
+
+    font-size:10px;
+    font-weight:600;
+}
+
+@keyframes inputIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ========================================
+   BUTTONS
+======================================== */
+
+.actions{
+    display:grid;
+
+    grid-template-columns:1fr 125px;
+
+    gap:12px;
+
+    margin-top:22px;
+}
+
+button{
+    height:52px;
+
+    border-radius:14px;
+
+    font-family:inherit;
+
+    font-size:12px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+.calculate-btn{
+    border:1px solid var(--neon);
+
+    background:var(--neon);
+
+    color:#080a08;
+
+    box-shadow:
+        0 0 18px rgba(217,255,85,.06),
+        0 10px 30px rgba(0,0,0,.25);
+}
+
+.calculate-btn:hover{
+    background:#e5ff7d;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 25px rgba(217,255,85,.15),
+        0 14px 35px rgba(0,0,0,.3);
+}
+
+.reset-btn{
+    border:1px solid var(--border);
+
+    background:#171a20;
+
+    color:#8c94a1;
+}
+
+.reset-btn:hover{
+    background:#1d2128;
+
+    color:#fff;
+
+    transform:translateY(-2px);
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+/* ========================================
+   RESULT
+======================================== */
+
+.result{
+    margin-top:22px;
+
+    min-height:105px;
+
+    padding:20px 22px;
+
+    border-radius:20px;
+
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            145deg,
+            #15191f,
+            #0e1014
+        );
+
+    display:none;
+
+    animation:resultIn .35s ease;
+}
+
+.result.show{
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+}
+
+.result.success{
+    border-color:rgba(217,255,85,.18);
+
+    box-shadow:
+        inset 0 0 30px rgba(217,255,85,.018);
+}
+
+.result-label{
+    color:#7c8490;
+
+    font-size:10px;
+    font-weight:600;
+}
+
+.result-sub{
+    color:#505762;
+
+    font-size:9px;
+
+    margin-top:4px;
+}
+
+.result-number{
+    color:var(--neon);
+
+    font-family:"Space Grotesk",sans-serif;
+
+    font-size:34px;
+    font-weight:700;
+
+    letter-spacing:-.05em;
+
+    text-shadow:
+        0 0 18px rgba(217,255,85,.14);
+}
+
+.error-message{
+    color:#ff8585;
+
+    font-size:12px;
+
+    line-height:1.5;
+}
+
+.result.error{
+    border-color:rgba(255,107,107,.2);
+}
+
+@keyframes resultIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media(max-width:850px){
+
+    body{
+        padding:15px;
+        align-items:flex-start;
+    }
+
+    .app{
+        grid-template-columns:1fr;
+        max-width:600px;
+    }
+
+    .sidebar{
+        min-height:330px;
+
+        padding:32px;
+
+        border-right:none;
+        border-bottom:1px solid var(--border);
+    }
+
+    .sidebar h1{
+        font-size:43px;
+    }
+
+    .calculator{
+        padding:32px;
+    }
+}
+
+@media(max-width:550px){
+
+    body{
+        padding:9px;
+    }
+
+    .app{
+        border-radius:24px;
+    }
+
+    .sidebar{
+        padding:27px 23px;
+    }
+
+    .sidebar h1{
+        font-size:38px;
+    }
+
+    .shape-card{
+        width:54px;
+        height:54px;
+    }
+
+    .calculator{
+        padding:23px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .actions{
+        grid-template-columns:1fr;
+    }
+
+    .status{
+        display:none;
+    }
+
+    .result.show{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .result-number{
+        font-size:30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="neon-light"></div>
+
+<div class="app">
+
+    <!-- ===============================
+         SIDEBAR
+    ================================ -->
+
+    <aside class="sidebar">
+
+        <div>
+
+            <div class="logo">
+
+                <div class="logo-icon">∠</div>
+
+                Geometry Lab
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <h1>
+                Measure.<br>
+                <span>Calculate.</span><br>
+                Done.
+            </h1>
+
+            <p class="sidebar-description">
+                Calculate geometric measurements quickly
+                with a clean, precise and intuitive calculator.
+            </p>
+
+
+            <!-- Outlined geometric illustrations -->
+
+            <div class="shape-preview">
+
+                <div class="shape-card" title="Square">
+                    <div class="square-shape"></div>
+                </div>
+
+                <div class="shape-card" title="Circle">
+                    <div class="circle-shape"></div>
+                </div>
+
+                <div class="shape-card" title="Rectangle">
+                    <div class="rectangle-shape"></div>
+                </div>
+
+                <div class="shape-card" title="Triangle">
+                    <svg class="triangle-svg" viewBox="0 0 30 26">
+                        <polygon points="15,3 27,23 3,23" fill="none" stroke="var(--neon)" stroke-width="2" stroke-linejoin="round" />
+                    </svg>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-footer">
+            PRECISION GEOMETRY TOOL · 2026
+        </div>
+
+    </aside>
+
+
+    <!-- ===============================
+         CALCULATOR
+    ================================ -->
+
+    <main class="calculator">
+
+        <div class="topbar">
+
+            <div>
+
+                <div class="eyebrow">
+                    Calculator
+                </div>
+
+                <h2>
+                    Geometry Calculator
+                </h2>
+
+            </div>
+
+
+            <div class="status" id="status">
+
+                <span class="status-dot"></span>
+
+                Ready
+
+            </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+            <div class="field">
+
+                <label
+                    class="field-label"
+                    for="shape"
+                >
+                    Shape
+                </label>
+
+                <div class="select-wrapper">
+
+                    <select
+                        id="shape"
+                        onchange="updateInputs()"
+                    >
+
+                        <option value="">
+                            Choose shape
+                        </option>
+
+                        <option value="square">
+                            Square
+                        </option>
+
+                        <option value="circle">
+                            Circle
+                        </option>
+
+                        <option value="rectangle">
+                            Rectangle
+                        </option>
+
+                        <option value="triangle">
+                            Triangle
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="field-label"
+                    for="calculation"
+                >
+                    Calculation
+                </label>
+
+                <div class="select-wrapper">
+
+                    <select id="calculation">
+
+                        <option value="">
+                            Choose type
+                        </option>
+
+                        <option value="area">
+                            Area
+                        </option>
+
+                        <option value="perimeter">
+                            Perimeter
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Dimensions -->
+
+        <div class="inputs-container">
+
+            <div class="inputs-header">
+
+                <div class="inputs-title">
+                    Dimensions
+                </div>
+
+                <div class="unit">
+                    Positive values only
+                </div>
+
+            </div>
+
+
+            <!-- Square -->
+
+            <div
+                class="input-row"
+                id="square-inputs"
+            >
+
+                <div class="dimension">
+
+                    <label for="square-side">
+                        Side length
+                    </label>
+
+                    <input
+                        type="number"
+                        id="square-side"
+                        placeholder="Enter side length"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Circle -->
+
+            <div
+                class="input-row"
+                id="circle-inputs"
+            >
+
+                <div class="dimension">
+
+                    <label for="circle-radius">
+                        Radius
+                    </label>
+
+                    <input
+                        type="number"
+                        id="circle-radius"
+                        placeholder="Enter radius"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Rectangle -->
+
+            <div
+                class="input-row"
+                id="rectangle-inputs"
+            >
+
+                <div class="dimension">
+
+                    <label for="rect-length">
+                        Length
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rect-length"
+                        placeholder="Enter length"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="dimension">
+
+                    <label for="rect-breadth">
+                        Width
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rect-breadth"
+                        placeholder="Enter width"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Triangle -->
+
+            <div
+                class="input-row"
+                id="triangle-inputs"
+            >
+
+                <div class="dimension">
+
+                    <label for="tri-base">
+                        Base (Side B)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tri-base"
+                        placeholder="Enter base length"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="dimension">
+
+                    <label for="tri-height">
+                        Height (For Area)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tri-height"
+                        placeholder="Enter height"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="dimension">
+
+                    <label for="tri-side-a">
+                        Side A (For Perimeter)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tri-side-a"
+                        placeholder="Enter side A"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="dimension">
+
+                    <label for="tri-side-c">
+                        Side C (For Perimeter)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tri-side-c"
+                        placeholder="Enter side C"
+                        step="any"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Buttons -->
+
+        <div class="actions">
+
+            <button
+                class="calculate-btn"
+                onclick="calculate()"
+            >
+                Calculate Result →
+            </button>
+
+            <button
+                class="reset-btn"
+                onclick="resetCalculator()"
+            >
+                Reset
+            </button>
+
+        </div>
+
+
+        <!-- Result -->
+
+        <div
+            class="result"
+            id="result"
+        ></div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function updateInputs(){
+
+    const shape =
+        document.getElementById("shape").value;
+
+    document
+        .querySelectorAll(".input-row")
+        .forEach(row =>
+            row.classList.remove("active")
+        );
+
+    if(shape){
+
+        const target =
+            document.getElementById(
+                shape + "-inputs"
+            );
+
+        if(target){
+            target.classList.add("active");
+        }
+
+        setStatus(true);
+
+    }else{
+
+        setStatus(false);
+
+    }
+
+    hideResult();
+
+}
+
+
+function calculate(){
+
+    const shape =
+        document.getElementById("shape").value;
+
+    const calculation =
+        document.getElementById("calculation").value;
+
+
+    if(!shape){
+
+        showError(
+            "Please select a shape first."
+        );
+
+        return;
+
+    }
+
+
+    if(!calculation){
+
+        showError(
+            "Please choose what you want to calculate."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        let value = 0;
+        let title = "";
+        let unit = "";
+
+
+        /* SQUARE */
+
+        if(shape === "square"){
+
+            const side =
+                parseFloat(
+                    document.getElementById(
+                        "square-side"
+                    ).value
+                );
+
+            validate(side,"side length");
+
+
+            if(calculation === "area"){
+
+                value = side * side;
+
+                title = "Area of Square";
+
+                unit = "square units";
+
+            }else{
+
+                value = 4 * side;
+
+                title = "Perimeter of Square";
+
+                unit = "units";
+
+            }
+
+        }
+
+
+        /* CIRCLE */
+
+        else if(shape === "circle"){
+
+            const radius =
+                parseFloat(
+                    document.getElementById(
+                        "circle-radius"
+                    ).value
+                );
+
+            validate(radius,"radius");
+
+
+            if(calculation === "area"){
+
+                value =
+                    Math.PI *
+                    radius *
+                    radius;
+
+                title = "Area of Circle";
+
+                unit = "square units";
+
+            }else{
+
+                value =
+                    2 *
+                    Math.PI *
+                    radius;
+
+                title =
+                    "Circumference of Circle";
+
+                unit = "units";
+
+            }
+
+        }
+
+
+        /* RECTANGLE */
+
+        else if(shape === "rectangle"){
+
+            const length =
+                parseFloat(
+                    document.getElementById(
+                        "rect-length"
+                    ).value
+                );
+
+            const width =
+                parseFloat(
+                    document.getElementById(
+                        "rect-breadth"
+                    ).value
+                );
+
+
+            validate(length,"length");
+            validate(width,"width");
+
+
+            if(calculation === "area"){
+
+                value =
+                    length * width;
+
+                title =
+                    "Area of Rectangle";
+
+                unit =
+                    "square units";
+
+            }else{
+
+                value =
+                    2 *
+                    (length + width);
+
+                title =
+                    "Perimeter of Rectangle";
+
+                unit =
+                    "units";
+
+            }
+
+        }
+
+
+        /* TRIANGLE */
+
+        else if(shape === "triangle"){
+
+            const base =
+                parseFloat(
+                    document.getElementById(
+                        "tri-base"
+                    ).value
+                );
+
+            validate(base,"Base");
+
+
+            if(calculation === "area"){
+
+                const height =
+                    parseFloat(
+                        document.getElementById(
+                            "tri-height"
+                        ).value
+                    );
+
+                validate(height,"Height");
+
+                value =
+                    0.5 *
+                    base *
+                    height;
+
+                title =
+                    "Area of Triangle";
+
+                unit =
+                    "square units";
+
+            }else{
+
+                const sideA =
+                    parseFloat(
+                        document.getElementById(
+                            "tri-side-a"
+                        ).value
+                    );
+
+                const sideC =
+                    parseFloat(
+                        document.getElementById(
+                            "tri-side-c"
+                        ).value
+                    );
+
+                validate(sideA,"Side A");
+                validate(sideC,"Side C");
+
+                /* Triangle Inequality Validation */
+                if (
+                    sideA + base <= sideC ||
+                    sideA + sideC <= base ||
+                    base + sideC <= sideA
+                ) {
+                    throw new Error(
+                        "Invalid triangle dimensions: The sum of any two sides must be strictly greater than the third side."
+                    );
+                }
+
+                value = sideA + base + sideC;
+
+                title =
+                    "Perimeter of Triangle";
+
+                unit =
+                    "units";
+
+            }
+
+        }
+
+
+        const result =
+            document.getElementById("result");
+
+
+        result.className =
+            "result show success";
+
+
+        result.innerHTML = `
+
+            <div>
+
+                <div class="result-label">
+                    ${title}
+                </div>
+
+                <div class="result-sub">
+                    Calculated successfully
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="result-number">
+                    ${formatNumber(value)}
+                </div>
+
+                <div
+                    class="result-sub"
+                    style="text-align:right"
+                >
+                    ${unit}
+                </div>
+
+            </div>
+
+        `;
+
+
+        setStatus(true);
+
+    }
+
+    catch(error){
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+function validate(value,name){
+
+    if(
+        Number.isNaN(value) ||
+        value <= 0
+    ){
+
+        throw new Error(
+            `Please enter a valid ${name}.`
+        );
+
+    }
+
+}
+
+
+function formatNumber(number){
+
+    return Number(
+        number.toFixed(2)
+    ).toLocaleString(
+        undefined,
+        {
+            maximumFractionDigits:2
+        }
+    );
+
+}
+
+
+function showError(message){
+
+    const result =
+        document.getElementById("result");
+
+
+    result.className =
+        "result show error";
+
+
+    result.innerHTML = `
+
+        <div class="error-message">
+
+            <strong>
+                Unable to calculate
+            </strong>
+
+            <br>
+
+            ${message}
+
+        </div>
+
+    `;
+
+
+    setStatus(false);
+
+}
+
+
+function hideResult(){
+
+    document
+        .getElementById("result")
+        .classList.remove("show");
+
+}
+
+
+function setStatus(active){
+
+    const status =
+        document.getElementById("status");
+
+
+    if(active){
+
+        status.classList.add("active");
+
+    }else{
+
+        status.classList.remove("active");
+
+    }
+
+}
+
+
+function resetCalculator(){
+
+    document.getElementById("shape").value = "";
+
+    document.getElementById("calculation").value = "";
+
+
+    document
+        .querySelectorAll("input")
+        .forEach(input =>
+            input.value = ""
+        );
+
+
+    document
+        .querySelectorAll(".input-row")
+        .forEach(row =>
+            row.classList.remove("active")
+        );
+
+
+    hideResult();
+
+    setStatus(false);
+
+}
+
+</script>
+
+</body>
+</html>
