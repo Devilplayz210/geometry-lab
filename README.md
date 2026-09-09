@@ -32,7 +32,6 @@ A sleek, cyberpunk-inspired dark-mode geometry calculator built with vanilla HTM
 Check out the live web app deployed via GitHub Pages:  
 👉 **[View Live Demo]([https://Devilplayz210.github.io/geometry-lab/])**
 
-*(Replace `<your-username>` and `<your-repo-name>` with your GitHub details)*
 
 ---
 
