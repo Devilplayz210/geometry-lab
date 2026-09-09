@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -435,13 +436,20 @@ body::after{
         0 0 8px rgba(181,140,255,.35);
 }
 
-/* Triangle (Hollow/Outlined SVG) */
+/* Triangle */
 
-.triangle-svg{
-    width:28px;
-    height:26px;
-    display:block;
-    filter:drop-shadow(0 0 6px rgba(217,255,85,.45));
+.triangle-shape{
+    width:0;
+    height:0;
+
+    border-left:14px solid transparent;
+    border-right:14px solid transparent;
+    border-bottom:25px solid var(--neon);
+
+    filter:
+        drop-shadow(
+            0 0 6px rgba(217,255,85,.4)
+        );
 }
 
 .sidebar-footer{
@@ -1007,26 +1015,24 @@ button:active{
             </p>
 
 
-            <!-- Outlined geometric illustrations -->
+            <!-- Proper geometric illustrations -->
 
             <div class="shape-preview">
 
-                <div class="shape-card" title="Square">
+                <div class="shape-card">
                     <div class="square-shape"></div>
                 </div>
 
-                <div class="shape-card" title="Circle">
+                <div class="shape-card">
                     <div class="circle-shape"></div>
                 </div>
 
-                <div class="shape-card" title="Rectangle">
+                <div class="shape-card">
                     <div class="rectangle-shape"></div>
                 </div>
 
-                <div class="shape-card" title="Triangle">
-                    <svg class="triangle-svg" viewBox="0 0 30 26">
-                        <polygon points="15,3 27,23 3,23" fill="none" stroke="var(--neon)" stroke-width="2" stroke-linejoin="round" />
-                    </svg>
+                <div class="shape-card">
+                    <div class="triangle-shape"></div>
                 </div>
 
             </div>
@@ -1273,25 +1279,8 @@ button:active{
 
                 <div class="dimension">
 
-                    <label for="tri-base">
-                        Base (Side B)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="tri-base"
-                        placeholder="Enter base length"
-                        step="any"
-                        min="0"
-                    >
-
-                </div>
-
-
-                <div class="dimension">
-
                     <label for="tri-height">
-                        Height (For Area)
+                        Height
                     </label>
 
                     <input
@@ -1307,31 +1296,14 @@ button:active{
 
                 <div class="dimension">
 
-                    <label for="tri-side-a">
-                        Side A (For Perimeter)
+                    <label for="tri-base">
+                        Base
                     </label>
 
                     <input
                         type="number"
-                        id="tri-side-a"
-                        placeholder="Enter side A"
-                        step="any"
-                        min="0"
-                    >
-
-                </div>
-
-
-                <div class="dimension">
-
-                    <label for="tri-side-c">
-                        Side C (For Perimeter)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="tri-side-c"
-                        placeholder="Enter side C"
+                        id="tri-base"
+                        placeholder="Enter base"
                         step="any"
                         min="0"
                     >
@@ -1389,6 +1361,34 @@ function updateInputs(){
             row.classList.remove("active")
         );
 
+
+    const calculation =
+        document.getElementById("calculation");
+
+
+    calculation.innerHTML = `
+        <option value="">Choose type</option>
+        <option value="area">Area</option>
+        <option value="perimeter">Perimeter</option>
+    `;
+
+
+    /*
+       Triangle currently has only
+       base + height, so perimeter
+       cannot be calculated accurately.
+    */
+
+    if(shape === "triangle"){
+
+        calculation.innerHTML = `
+            <option value="">Choose type</option>
+            <option value="area">Area</option>
+        `;
+
+    }
+
+
     if(shape){
 
         const target =
@@ -1407,6 +1407,7 @@ function updateInputs(){
         setStatus(false);
 
     }
+
 
     hideResult();
 
@@ -1583,6 +1584,13 @@ function calculate(){
 
         else if(shape === "triangle"){
 
+            const height =
+                parseFloat(
+                    document.getElementById(
+                        "tri-height"
+                    ).value
+                );
+
             const base =
                 parseFloat(
                     document.getElementById(
@@ -1590,70 +1598,21 @@ function calculate(){
                     ).value
                 );
 
-            validate(base,"Base");
+
+            validate(height,"height");
+            validate(base,"base");
 
 
-            if(calculation === "area"){
+            value =
+                0.5 *
+                base *
+                height;
 
-                const height =
-                    parseFloat(
-                        document.getElementById(
-                            "tri-height"
-                        ).value
-                    );
+            title =
+                "Area of Triangle";
 
-                validate(height,"Height");
-
-                value =
-                    0.5 *
-                    base *
-                    height;
-
-                title =
-                    "Area of Triangle";
-
-                unit =
-                    "square units";
-
-            }else{
-
-                const sideA =
-                    parseFloat(
-                        document.getElementById(
-                            "tri-side-a"
-                        ).value
-                    );
-
-                const sideC =
-                    parseFloat(
-                        document.getElementById(
-                            "tri-side-c"
-                        ).value
-                    );
-
-                validate(sideA,"Side A");
-                validate(sideC,"Side C");
-
-                /* Triangle Inequality Validation */
-                if (
-                    sideA + base <= sideC ||
-                    sideA + sideC <= base ||
-                    base + sideC <= sideA
-                ) {
-                    throw new Error(
-                        "Invalid triangle dimensions: The sum of any two sides must be strictly greater than the third side."
-                    );
-                }
-
-                value = sideA + base + sideC;
-
-                title =
-                    "Perimeter of Triangle";
-
-                unit =
-                    "units";
-
-            }
+            unit =
+                "square units";
 
         }
 
@@ -1835,3 +1794,4 @@ function resetCalculator(){
 
 </body>
 </html>
+
