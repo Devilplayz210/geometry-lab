@@ -43,4 +43,5 @@ Check out the live web app deployed via GitHub Pages:
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Devilplayz210/geometry-lab.git
-cd geometry-lab
+   cd geometry-lab
+
